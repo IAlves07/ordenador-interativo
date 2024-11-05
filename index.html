@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordenação de Vetores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .panel {
+            width: 45%;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .panel input[type="number"],
+        .panel select,
+        .panel button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .panel button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .panel button:hover {
+            background-color: #0056b3;
+        }
+
+        .panel ul {
+            list-style-type: none;
+            padding: 0;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .panel ul li {
+            padding: 5px 0;
+            font-size: 1.1em;
+        }
+    </style>
+    <script src="ordenando.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Painel 1 -->
+        <div class="panel">
+            <h2>Ordenando Valores</h2>
+            <label for="valor1">Valor</label>
+            <input type="number" id="valor1" placeholder="Digite um valor">
+            <button onclick="add(1)">Adicionar</button>
+            <select id="algoritmo1">
+                <option value="bubble_sort">Bubble Sort</option>
+                <option value="selection_sort">Selection Sort</option>
+                <option value="quick_sort">Quick Sort</option>
+            </select>
+            <button onclick="ordenar(1)">Ordenar</button>
+            <button onclick="misturar(1)">Misturar</button>
+            <ul id="valores1"></ul>
+        </div>
+
+        <!-- Painel 2 -->
+        <div class="panel">
+            <h2>Ordenando Valores</h2>
+            <label for="valor2">Valor</label>
+            <input type="number" id="valor2" placeholder="Digite um valor">
+            <button onclick="add(2)">Adicionar</button>
+            <select id="algoritmo2">
+                <option value="bubble_sort">Bubble Sort</option>
+                <option value="selection_sort">Selection Sort</option>
+                <option value="quick_sort">Quick Sort</option>
+            </select>
+            <button onclick="ordenar(2)">Ordenar</button>
+            <button onclick="misturar(2)">Misturar</button>
+            <ul id="valores2"></ul>
+        </div>
+    </div>
+
+    <script>
+        const arrays = {
+            1: [],
+            2: []
+        };
+
+        function add(panel) {
+            const valorInput = document.getElementById('valor' + panel);
+            const valor = parseInt(valorInput.value);
+            if (!isNaN(valor)) {
+                arrays[panel].push(valor);
+                valorInput.value = '';
+                exibirValores(panel);
+            }
+        }
+
+        function exibirValores(panel) {
+            const lista = document.getElementById('valores' + panel);
+            lista.innerHTML = '';
+            arrays[panel].forEach((val) => {
+                const item = document.createElement('li');
+                item.textContent = val;
+                lista.appendChild(item);
+            });
+        }
+
+        function ordenar(panel) {
+            const algoritmo = document.getElementById('algoritmo' + panel).value;
+            if (algoritmo === 'bubble_sort') {
+                bubble_sort(arrays[panel]);
+            } else if (algoritmo === 'selection_sort') {
+                selection_sort(arrays[panel]);
+            } else if (algoritmo === 'quick_sort') {
+                quick_sort(arrays[panel], 0, arrays[panel].length - 1);
+            }
+            exibirValores(panel);
+        }
+
+        function misturar(panel) {
+            shuffle(arrays[panel]);
+            exibirValores(panel);
+        }
+
+        function bubble_sort(arr) {
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = 0; j < arr.length - i - 1; j++) {
+                    if (arr[j] > arr[j + 1]) {
+                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                    }
+                }
+            }
+        }
+
+        function selection_sort(arr) {
+            for (let i = 0; i < arr.length; i++) {
+                let minIdx = i;
+                for (let j = i + 1; j < arr.length; j++) {
+                    if (arr[j] < arr[minIdx]) {
+                        minIdx = j;
+                    }
+                }
+                if (minIdx !== i) {
+                    [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+                }
+            }
+        }
+
+        function quick_sort(arr, left, right) {
+            if (left < right) {
+                let pivotIndex = partition(arr, left, right);
+                quick_sort(arr, left, pivotIndex - 1);
+                quick_sort(arr, pivotIndex + 1, right);
+            }
+        }
+
+        function partition(arr, left, right) {
+            let pivot = arr[right];
+            let i = left - 1;
+            for (let j = left; j < right; j++) {
+                if (arr[j] < pivot) {
+                    i++;
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+            }
+            [arr[i + 1], arr[right]] = [arr[right], arr[i + 1]];
+            return i + 1;
+        }
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+    </script>
+</body>
+</html>
